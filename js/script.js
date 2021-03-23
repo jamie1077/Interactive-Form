@@ -66,6 +66,8 @@ activities.addEventListener('change', e => {
 
 
 // payment info to allow for future proofing avoid equating exact string values
+let selected = payment[1].setAttribute('selected', 'selected');
+
 paymentMethod.addEventListener('change', e => {
     for(let i = 0; i < paymentBlocks.length; i++){
         let choice = e.target.value;

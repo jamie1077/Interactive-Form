@@ -78,3 +78,52 @@ paymentMethod.addEventListener('change', e => {
         }
     }
 });
+
+//Validation
+
+const form = document.querySelector('form');
+const nameElement = document.querySelector('#name');
+const emailElement = document.querySelector('#email');
+const validationMessage = document.querySelectorAll('.hint');
+
+function validation(arg1){  
+    arg1.classList.add('error');
+    
+    for(let i = 0; i < validationMessage.length; i++){  
+        validationMessage[i].style.display = 'block';
+    } 
+}
+
+
+function nameValidator (){
+    const nameValue = nameElement.value;
+    
+    // tests that there is at least a first name containing only letters, and allows for a middle and last name.
+    const nameIsValid = /^[a-zA-Z]+ ?[a-zA-Z]*? ?[a-zA-Z]*?$/.test(nameValue);
+
+    return nameIsValid;
+}
+
+
+function emailValidator (){
+    const emailValue = emailElement.value;
+
+    // tests that there is a few characters for the username, followed by “@”, followed by a few more characters 
+    const emailIsValid = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(emailValue);
+      
+    return emailIsValid;
+}
+
+
+/* Submit listener on the form submit */
+form.addEventListener('submit', e => {
+    e.preventDefault();
+
+    if(!nameValidator()){
+      validation(nameElement);
+    }
+
+    if(!emailValidator()){
+        validation(emailElement);
+    }
+});

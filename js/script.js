@@ -1,4 +1,4 @@
-const focusOnLoad = document.querySelector('#name').focus();
+const focusOnLoad = document.querySelector('#name').focus(); //name field to be focussed on page load
 const jobRoles = document.querySelector('#title');
 const otherJobRole = document.querySelector('#other-job-role');
 otherJobRole.setAttribute('type', 'hidden');
@@ -7,6 +7,7 @@ colorList.setAttribute('disabled', '');
 const designList = document.querySelector('#design');
 const activities = document.querySelector('#activities');
 const activityCheckboxes = document.querySelectorAll('#activities input');
+const activitiesBox = document.querySelector('#activities-box');
 const paymentMethod = document.querySelector('#payment');
 const creditCard = document.querySelector('#credit-card');
 creditCard.style.display = 'block';
@@ -15,6 +16,14 @@ paypal.style.display = 'none';
 const bitcoin = document.querySelector('#bitcoin');
 bitcoin.style.display = 'none';
 const paymentBlocks = [creditCard, paypal, bitcoin];
+const form = document.querySelector('form');
+const nameElement = document.querySelector('#name');
+const emailElement = document.querySelector('#email');
+const cardNumber = document.querySelector('#cc-num');
+const zipCode = document.querySelector('#zip');
+const cvv = document.querySelector('#cvv');
+
+let total = 0; //activites total used for calculating activity costs and in validating 
 
 //show 'other-job-role' field only when 'other' option is selected
 jobRoles.addEventListener('change', e => {
@@ -49,12 +58,11 @@ designList.addEventListener('change', e => {
 
 
 // total cost of activities is updated on user selection
-let total = 0;
-
 activities.addEventListener('change', e => {
     let activity = e.target;
     let cost = parseInt(activity.getAttribute('data-cost'));
-
+    let dayTime = activity.getAttribute('data-day-and-time');
+    
     if (activity.checked) {
         total += cost;
     }else{
@@ -62,6 +70,20 @@ activities.addEventListener('change', e => {
     }
 
     document.getElementById('activities-cost').innerHTML = `Total: $${total}`;
+
+    //disable activites with matching day/time to checked
+    for(let i = 0; i < activityCheckboxes.length; i++){
+        let comparison = activityCheckboxes[i].getAttribute('data-day-and-time');
+        if(comparison === dayTime && activityCheckboxes[i] !== activity){
+            if(activity.checked){
+                activityCheckboxes[i].disabled = true;
+                activityCheckboxes[i].parentElement.classList.add('disabled');
+            }else{
+                activityCheckboxes[i].disabled = false;
+            activityCheckboxes[i].parentElement.classList.remove('disabled');
+            }
+        }
+    }
 });
 
 
@@ -79,39 +101,100 @@ paymentMethod.addEventListener('change', e => {
     }
 });
 
-//Validation
 
-const form = document.querySelector('form');
-const nameElement = document.querySelector('#name');
-const emailElement = document.querySelector('#email');
-const validationMessage = document.querySelectorAll('.hint');
+/**
+ * Validation 
+**/
 
-function validation(arg1){  
-    arg1.classList.add('error');
-    
-    for(let i = 0; i < validationMessage.length; i++){  
-        validationMessage[i].style.display = 'block';
-    } 
+// if validation fails classes and styling added to emphasise user error and helpful hints added to required form fields
+function validateFail(arg){  
+    arg.parentElement.classList.add('not-valid');
+    arg.parentElement.classList.remove('valid');
+    arg.parentElement.lastElementChild.style.display = 'block';
+}
+
+//if validation passes fail classes and styling removed and hints hidden
+function validatePass(arg){  
+    arg.parentElement.classList.add('valid');
+    arg.parentElement.classList.remove('not-valid');
+    arg.parentElement.lastElementChild.style.display = 'none';
 }
 
 
 function nameValidator (){
-    const nameValue = nameElement.value;
-    
-    // tests that there is at least a first name containing only letters, and allows for a middle and last name.
-    const nameIsValid = /^[a-zA-Z]+ ?[a-zA-Z]*? ?[a-zA-Z]*?$/.test(nameValue);
+    // tests that the name field is not blank or empty and contains only letters.
+    const nameIsValid = /^[a-zA-Z]+ ?[a-zA-Z]*? ?[a-zA-Z]*?$/.test(nameElement.value);
+
+    if(nameIsValid){
+        validatePass(nameElement);
+    }else{
+        validateFail(nameElement);
+    }
 
     return nameIsValid;
 }
 
-
 function emailValidator (){
-    const emailValue = emailElement.value;
+    // tests that there is a few characters for the username, followed by "@", followed by a few more characters , followed by ".com"
+    const emailIsValid = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[com]{2,3}/.test(emailElement.value);
 
-    // tests that there is a few characters for the username, followed by “@”, followed by a few more characters 
-    const emailIsValid = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(emailValue);
-      
+    if(emailIsValid){
+        validatePass(emailElement);
+    }else{
+        validateFail(emailElement);
+    }
+    
     return emailIsValid;
+}
+
+function activityValidator (){
+    const activityIsValid = total > 0;
+    
+    if(activityIsValid){
+        validatePass(activitiesBox);
+    }else{
+        validateFail(activitiesBox);
+    }
+    return activityIsValid;
+}
+
+function cardNoValidator (){
+    // tests card number field contains a 13 - 16 digit credit card number with no dashes or spaces.
+    const cardIsValid = /^[0-9]{13,16}$/.test(cardNumber.value);
+
+    if(cardIsValid){
+        validatePass(cardNumber);
+    }else{
+        validateFail(cardNumber);
+    }
+    
+    return cardIsValid;
+}
+
+function zipValidator (){
+    // tests zip code field contains a 5 digit number.
+    const zipIsValid = /^\d{5}$/.test(zipCode.value);
+
+    if(zipIsValid){
+        validatePass(zipCode);
+    }else{
+        validateFail(zipCode);
+    }
+
+    return zipIsValid;
+}
+
+function cvvValidator (){
+    // tests cvv field contains a 3 digit number.
+    const cvvIsValid = /^[0-9]{3,}$/.test(cvv.value);
+
+    if(cvvIsValid){
+        validatePass(cvv);
+    }else{
+        validateFail(cvv);
+    }
+
+    return cvvIsValid;
 }
 
 
@@ -119,11 +202,45 @@ function emailValidator (){
 form.addEventListener('submit', e => {
     e.preventDefault();
 
-    if(!nameValidator()){
-      validation(nameElement);
+    if(!nameValidator()){  
+        console.log('Invalid name prevented submission');
+        e.preventDefault();
     }
 
-    if(!emailValidator()){
-        validation(emailElement);
+    if(!emailValidator()){  
+        console.log('Invalid email prevented submission');
+        e.preventDefault();
     }
+
+    if(!activityValidator()){
+        console.log('Invalid activity prevented submission');
+        e.preventDefault();
+    }
+
+    if(paymentMethod.value === 'credit-card'){
+        if(!cardNoValidator()){
+            console.log('Invalid card number prevented submission');
+            e.preventDefault();
+        }
+    
+        if(!zipValidator()){
+            console.log('Invalid zip code prevented submission');
+            e.preventDefault();
+        }
+    
+        if(!cvvValidator()){
+            console.log('Invalid cvv number prevented submission');
+            e.preventDefault();
+        }
+    }
+});
+
+
+activityCheckboxes.forEach(cb => {
+    cb.addEventListener('focus', e => cb.parentElement.classList.add('focus'));
+
+    cb.addEventListener('blur', e => {
+        const active = document.querySelector('.focus');
+        if (active) active.classList.remove('focus');
+    })
 });

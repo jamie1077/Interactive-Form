@@ -71,7 +71,7 @@ activities.addEventListener('change', e => {
 
     document.getElementById('activities-cost').innerHTML = `Total: $${total}`;
 
-    //disable activites with matching day/time to checked
+    //disable activites with matching day/time if checked
     for(let i = 0; i < activityCheckboxes.length; i++){
         let comparison = activityCheckboxes[i].getAttribute('data-day-and-time');
         if(comparison === dayTime && activityCheckboxes[i] !== activity){
@@ -137,11 +137,18 @@ function nameValidator (){
 function emailValidator (){
     // tests that there is a few characters for the username, followed by "@", followed by a few more characters , followed by ".com"
     const emailIsValid = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[com]{2,3}/.test(emailElement.value);
+    const hint = document.querySelector('#email-hint');
 
     if(emailIsValid){
         validatePass(emailElement);
     }else{
         validateFail(emailElement);
+    }
+
+    if(emailElement.value === ''){
+        hint.innerHTML = 'Email field cannot be blank';
+    }else{
+        hint.innerHTML = 'Email field must be formatted correctly';
     }
     
     return emailIsValid;
@@ -197,45 +204,30 @@ function cvvValidator (){
     return cvvIsValid;
 }
 
+/*Real time validation messaging*/
+form.addEventListener('keyup', e => {
+    nameValidator();
+});
 
 /* Submit listener on the form submit */
 form.addEventListener('submit', e => {
-    e.preventDefault();
-
-    if(!nameValidator()){  
-        console.log('Invalid name prevented submission');
-        e.preventDefault();
-    }
-
-    if(!emailValidator()){  
-        console.log('Invalid email prevented submission');
-        e.preventDefault();
-    }
-
-    if(!activityValidator()){
-        console.log('Invalid activity prevented submission');
-        e.preventDefault();
-    }
+    nameValidator();
+    emailValidator();
+    activityValidator();
 
     if(paymentMethod.value === 'credit-card'){
-        if(!cardNoValidator()){
-            console.log('Invalid card number prevented submission');
-            e.preventDefault();
-        }
-    
-        if(!zipValidator()){
-            console.log('Invalid zip code prevented submission');
-            e.preventDefault();
-        }
-    
-        if(!cvvValidator()){
-            console.log('Invalid cvv number prevented submission');
-            e.preventDefault();
-        }
+      cardNoValidator();
+      zipValidator();
+      cvvValidator();
     }
+    e.preventDefault();
 });
 
+/*
+ * Accessibility
+*/
 
+//focus state on fields when tabbing
 activityCheckboxes.forEach(cb => {
     cb.addEventListener('focus', e => cb.parentElement.classList.add('focus'));
 

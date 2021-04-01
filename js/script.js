@@ -121,6 +121,10 @@ function validatePass(arg){
 }
 
 
+/**
+ * Helper Functions 
+**/
+
 function nameValidator (){
     // tests that the name field is not blank or empty and contains only letters.
     const nameIsValid = /^[a-zA-Z]+ ?[a-zA-Z]*? ?[a-zA-Z]*?$/.test(nameElement.value);
@@ -204,30 +208,11 @@ function cvvValidator (){
     return cvvIsValid;
 }
 
-/*Real time validation messaging*/
-form.addEventListener('keyup', e => {
-    nameValidator();
-});
-
-/* Submit listener on the form submit */
-form.addEventListener('submit', e => {
-    nameValidator();
-    emailValidator();
-    activityValidator();
-
-    if(paymentMethod.value === 'credit-card'){
-      cardNoValidator();
-      zipValidator();
-      cvvValidator();
-    }
-    e.preventDefault();
-});
 
 /*
- * Accessibility
+ * Accessibility - focus state on field when tabbing
 */
 
-//focus state on fields when tabbing
 activityCheckboxes.forEach(cb => {
     cb.addEventListener('focus', e => cb.parentElement.classList.add('focus'));
 
@@ -236,3 +221,45 @@ activityCheckboxes.forEach(cb => {
         if (active) active.classList.remove('focus');
     })
 });
+
+
+/**
+ * Real time validation messaging on name field
+**/
+
+form.addEventListener('keyup', e => {
+    nameValidator();
+});
+
+
+/**
+ * Submit listener on the form submit 
+**/
+
+form.addEventListener('submit', e => {
+    if(!nameValidator()){ 
+        e.preventDefault();
+    } 
+    
+    if(!emailValidator()){
+        e.preventDefault();
+    } 
+    
+    if(!activityValidator()){
+        e.preventDefault();
+    }
+
+    if(paymentMethod.value === 'credit-card'){
+        if(!cardNoValidator()){
+            e.preventDefault();
+        }
+        if(!zipValidator()){
+            e.preventDefault();
+        }
+        if(!cvvValidator()){
+            e.preventDefault();
+        }
+    }
+});
+
+

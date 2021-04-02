@@ -138,7 +138,7 @@ function nameValidator (){
 
 function emailValidator (){
     // tests that there is a few characters for the username, followed by "@", followed by a few more characters , followed by ".com"
-    const emailIsValid = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[com]{2,3}/.test(emailElement.value);
+    const emailIsValid = /^([a-zA-Z\-0-9.]+)@([a-zA-Z\-0-9]+).com$/.test(emailElement.value);
     const hint = document.querySelector('#email-hint');
 
     if(emailIsValid){

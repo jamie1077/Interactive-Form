@@ -197,7 +197,7 @@ function zipValidator (){
 
 function cvvValidator (){
     // tests cvv field contains a 3 digit number.
-    const cvvIsValid = /^[0-9]{3,}$/.test(cvv.value);
+    const cvvIsValid = /^[0-9]{3}$/.test(cvv.value);
 
     if(cvvIsValid){
         validatePass(cvv);

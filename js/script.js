@@ -27,14 +27,12 @@ let total = 0; //activites total used for calculating activity costs and in vali
 
 //show 'other-job-role' field only when 'other' option is selected
 jobRoles.addEventListener('change', e => {
-    for(let i = 0; i < jobRoles.length; i++){
-        let selected = e.target.value;
-        
-        if(selected === 'other'){
-            otherJobRole.setAttribute('type', 'text');
-        }else{
-            otherJobRole.setAttribute('type', 'hidden');
-        }
+    let selected = e.target.value;
+    
+    if(selected === 'other'){
+        otherJobRole.setAttribute('type', 'text');
+    }else{
+        otherJobRole.setAttribute('type', 'hidden');
     }
 });
 
